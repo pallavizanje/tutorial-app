@@ -4,11 +4,22 @@ import {
   UNSAFE_NavigationContext as NavigationContext
 } from "react-router-dom";
 
-export function useBlocker(blocker: (tx: any) => void, when = true) {
-  const navigator = useContext(NavigationContext).navigator;
+type Transition = {
+  retry: () => void;
+  location: Location;
+  action: string;
+};
+
+export function useBlocker(blocker: (tx: Transition) => void, when = true) {
+  const navigator = useContext(NavigationContext).navigator as any;
 
   useEffect(() => {
     if (!when) return;
+
+    if (!navigator.block) {
+      console.error("navigator.block is not available. Ensure you're using <BrowserRouter>.");
+      return;
+    }
 
     const unblock = navigator.block((tx: any) => {
       const autoUnblockingTx = {
