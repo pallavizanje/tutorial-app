@@ -1,24 +1,17 @@
 // hooks/useBlocker.ts
-import { useContext, useEffect } from 'react';
-import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
+import React, { useState } from "react";
+import ConfirmNavigation from "./ConfirmNavigation";
 
-export function useBlocker(blocker: (tx: any) => void, when = true) {
-  const { navigator } = useContext(NavigationContext);
+const FormPage = () => {
+  const [isDirty, setIsDirty] = useState(true); // Set to true when form is edited
 
-  useEffect(() => {
-    if (!when) return;
+  return (
+    <>
+      <h1 className="text-2xl font-bold mb-4">My Form Page</h1>
+      {/* Your form content here */}
+      <ConfirmNavigation when={isDirty} />
+    </>
+  );
+};
 
-    const unblock = navigator.block((tx: any) => {
-      const autoUnblockingTx = {
-        ...tx,
-        retry() {
-          unblock();
-          tx.retry();
-        },
-      };
-      blocker(autoUnblockingTx);
-    });
-
-    return unblock;
-  }, [navigator, blocker, when]);
-}
+export default FormPage;
