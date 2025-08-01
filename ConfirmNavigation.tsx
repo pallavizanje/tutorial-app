@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { useBlocker } from "./NavigationGuard";
+import { useBlocker } from "./hooks/useBlocker";
 
 type Props = {
   when: boolean;
@@ -7,7 +7,6 @@ type Props = {
 
 const ConfirmNavigation: React.FC<Props> = ({ when }) => {
   const [showModal, setShowModal] = useState(false);
-  const [nextLocation, setNextLocation] = useState<any>(null);
   const [retryFunc, setRetryFunc] = useState<(() => void) | null>(null);
 
   const blocker = useCallback(
@@ -17,7 +16,6 @@ const ConfirmNavigation: React.FC<Props> = ({ when }) => {
         return;
       }
       setShowModal(true);
-      setNextLocation(tx.location);
       setRetryFunc(() => () => tx.retry());
     },
     [when]
@@ -32,7 +30,6 @@ const ConfirmNavigation: React.FC<Props> = ({ when }) => {
 
   const handleCancel = () => {
     setShowModal(false);
-    setNextLocation(null);
     setRetryFunc(null);
   };
 
@@ -43,13 +40,13 @@ const ConfirmNavigation: React.FC<Props> = ({ when }) => {
         <p className="mb-4">You have unsaved changes. Do you really want to leave?</p>
         <div className="flex justify-end space-x-4">
           <button
-            className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+            className="bg-gray-300 px-4 py-2 rounded"
             onClick={handleCancel}
           >
             No
           </button>
           <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+            className="bg-red-600 text-white px-4 py-2 rounded"
             onClick={handleConfirm}
           >
             Yes
